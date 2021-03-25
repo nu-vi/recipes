@@ -19,7 +19,7 @@ class FacebookAuth extends React.Component {
         <button
           onClick={this.onSignInClick}
           className="ui massive facebook button"
-          style={{ margin: '5px', width: '340px' }}
+          style={{ margin: '5px', maxWidth: '340px' }}
         >
           <i className="facebook icon" />
           Sign in with Facebook

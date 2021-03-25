@@ -13,7 +13,7 @@ class Header extends React.Component {
             className="ui button"
             style={{ color: '#FDF8F5', backgroundColor: '#266150' }}
           >
-            Log-in
+            Log in
           </div>
         </Link>
       );
@@ -24,7 +24,7 @@ class Header extends React.Component {
           className="ui button"
           style={{ color: '#FDF8F5', backgroundColor: '#266150' }}
         >
-          Log-out
+          Log out
         </div>
       </button>
     );
