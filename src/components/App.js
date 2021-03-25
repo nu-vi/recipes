@@ -2,8 +2,8 @@ import React from 'react';
 import Header from './Header';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import AuthSelectorC from './Auth/AuthSelectorC';
-import ShowRecipes from './ShowRecipes';
-import PrivacyPolicy from './PrivacyPolicy';
+import ShowRecipes from './pages/ShowRecipes';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 
 const App = () => {

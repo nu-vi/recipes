@@ -2,7 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import GoogleAuth from './GoogleAuth';
 import FacebookAuth from './FacebookAuth';
-import Modal from './Modal';
+import Modal from '../Modal';
 
 const AuthSelectorC = () => {
   const history = useHistory();
