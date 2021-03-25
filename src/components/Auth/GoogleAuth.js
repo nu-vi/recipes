@@ -2,13 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { signIn, signOut } from '../../actions';
 import { withRouter } from 'react-router-dom';
+import { checkGoogleAuthState } from '../../services/accountService';
 
 class GoogleAuth extends React.Component {
+  onSignInClick = async () => {
+    await window.gapi.auth2.getAuthInstance().signIn();
 
-  onSignInClick = () => {
-    this.window.gapi.auth2.getAuthInstance().signIn().then(() => {
-      this.props.history.push('/');
-    });
+    checkGoogleAuthState().then(this.props.history.push('/'));
   };
 
   render() {

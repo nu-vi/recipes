@@ -2,16 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { signIn, signOut } from '../../actions';
 import { withRouter } from 'react-router-dom';
-import {checkFbAuthState} from '../../services/accountService';
+import { checkFbAuthState } from '../../services/accountService';
 
 class FacebookAuth extends React.Component {
+  onSignInClick = async () => {
+    const { authResponse } = await new Promise(window.FB.login);
 
-  onSignInClick = () => {
-    if (window.FB !== undefined) {
-      window.FB.login(() => {
-        checkFbAuthState().then(this.props.history.push('/'));
-      });
-    }
+    if(!authResponse) return;
+
+    checkFbAuthState().then(this.props.history.push('/'));
   };
 
   render() {

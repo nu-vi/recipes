@@ -4,7 +4,7 @@ export const initFacebookSdk = async () => {
   window.fbAsyncInit = () => {
     window.FB.init({
       appId: '197855785071465',
-      cookie: true,
+      cookie: false,
       xfbml: true,
       version: 'v10.0',
     });

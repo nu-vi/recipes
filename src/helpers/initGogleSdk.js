@@ -1,4 +1,4 @@
-import { onGoogleAuthChange } from '../services/accountService';
+import { checkGoogleAuthState } from '../services/accountService';
 
 export const initGoogleSdk = async () => {
   await window.gapi.load('client:auth2', () => {
@@ -9,12 +9,8 @@ export const initGoogleSdk = async () => {
         scope: 'profile email',
       })
       .then(() => {
-        const googleAuth = window.gapi.auth2.getAuthInstance();
-
-        onGoogleAuthChange(googleAuth.isSignedIn.get());
-        googleAuth.isSignedIn.listen(onGoogleAuthChange);
-
-        return googleAuth;
+        checkGoogleAuthState()
+        return window.gapi.auth2.getAuthInstance();
       });
   });
 }

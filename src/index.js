@@ -23,7 +23,7 @@ const startApp = () => {
   );
 };
 
-initGoogleSdk().then((googleAuth) => {
+initGoogleSdk().then(() => {
   initFacebookSdk().then(startApp);
 });
 
