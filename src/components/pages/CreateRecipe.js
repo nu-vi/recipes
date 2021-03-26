@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Button, Dropdown, Input } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
 import { Formik, Form } from 'formik';
 
 const options = [
