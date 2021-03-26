@@ -17,7 +17,7 @@ const options = [
 
 const CreateRecipe = () => {
   const [ingredientInputs, setIngredientInputs] = useState(0);
-  const [stepInputs, setStepInputs] = useState(0);
+  //const [stepInputs, setStepInputs] = useState(0);
 
   const addIngredientInput = () => {
     setIngredientInputs(ingredientInputs + 1);
