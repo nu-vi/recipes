@@ -1,4 +1,4 @@
-import React, { createRef, useState, useEffect } from 'react';
+import React, {createRef, useState, useEffect} from 'react';
 import { Button, Input, Select } from 'semantic-ui-react';
 import { Formik, Form } from 'formik';
 
@@ -25,12 +25,12 @@ const CreateRecipe = () => {
     if(inputRefs[inputRefs.length - 1]) {
       inputRefs[inputRefs.length - 1].current.focus();
     }
-  }, [inputRefs]);
+  }, [inputRefs]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const addIngredientInput = () => {
     setIngredientInputs(ingredientInputs + 1);
-
   };
+
   const renderIngredientInput = () => {
     let inputs = [];
     for (let i = 0; i < ingredientInputs; i++) {
