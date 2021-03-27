@@ -1,4 +1,4 @@
-import React, {createRef, useState, useEffect} from 'react';
+import React, { createRef, useState, useEffect } from 'react';
 import { Button, Input, Select } from 'semantic-ui-react';
 import { Formik, Form } from 'formik';
 
@@ -17,15 +17,23 @@ const options = [
 
 const CreateRecipe = () => {
   const [ingredientInputs, setIngredientInputs] = useState(0);
-  //const [stepInputs, setStepInputs] = useState(0);
+  const [stepInputs, setStepInputs] = useState(0);
 
   const inputRefs = [];
 
   useEffect(() => {
-    if(inputRefs[inputRefs.length - 1]) {
+    if (inputRefs[inputRefs.length - 1]) {
       inputRefs[inputRefs.length - 1].current.focus();
+      console.log(inputRefs);
     }
-  }, [inputRefs]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [inputRefs]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const numerals = (number) => {
+    if (number === 1) return 'st';
+    if (number === 2) return 'nd';
+    if (number === 3) return 'rd';
+    else return 'th';
+  };
 
   const addIngredientInput = () => {
     setIngredientInputs(ingredientInputs + 1);
@@ -41,7 +49,7 @@ const CreateRecipe = () => {
             type="text"
             placeholder="qt"
             style={{ width: '7ch' }}
-            ref={inputRefs[i]}
+            ref={inputRefs[inputRefs.length - 1]}
           />
           <Select
             compact
@@ -53,7 +61,26 @@ const CreateRecipe = () => {
         </div>
       );
     }
+    return <div>{inputs}</div> || null;
+  };
 
+  const addStepsInput = () => {
+    setStepInputs(stepInputs + 1);
+  };
+
+  const renderStepInput = () => {
+    let inputs = [];
+    for (let i = 0; i < stepInputs; i++) {
+      inputRefs.push(createRef());
+      inputs.push(
+        <div key={i} style={{ padding: '2px 3px 2px 15px' }}>
+          <Input
+            placeholder={`${inputs.length + 1 + numerals(i + 1)} Step`}
+            ref={inputRefs[inputRefs.length - 1]}
+          />
+        </div>
+      );
+    }
     return <div>{inputs}</div> || null;
   };
 
@@ -64,17 +91,29 @@ const CreateRecipe = () => {
         {(formikProps) => (
           <Form>
             <Input label="title" style={{ paddingBottom: '6px' }} />
+
             {renderIngredientInput()}
+            <Button
+              type="button"
+              onClick={addIngredientInput}
+              className="ui button"
+              style={{ margin: '6px 0 6px 0' }}
+            >
+              Add Ingredient
+            </Button>
+
+            {renderStepInput()}
+            <Button
+              type="button"
+              onClick={addStepsInput}
+              className="ui button"
+              style={{ margin: '6px 0 6px 0' }}
+            >
+              Add Step
+            </Button>
           </Form>
         )}
       </Formik>
-      <Button
-        onClick={addIngredientInput}
-        className="ui button"
-        style={{ marginTop: '6px' }}
-      >
-        Add Ingredient
-      </Button>
     </>
   );
 };
