@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Button, Dropdown, Input } from 'semantic-ui-react';
+import React, { createRef, useState, useEffect } from 'react';
+import { Button, Dropdown, Input, Select } from 'semantic-ui-react';
 import { Formik, Form } from 'formik';
 
 const options = [
@@ -19,23 +19,37 @@ const CreateRecipe = () => {
   const [ingredientInputs, setIngredientInputs] = useState(0);
   //const [stepInputs, setStepInputs] = useState(0);
 
+  const inputRefs = [];
+
+  useEffect(() => {
+    if(inputRefs[inputRefs.length - 1]) {
+      inputRefs[inputRefs.length - 1].current.focus();
+    }
+  }, [inputRefs]);
+
   const addIngredientInput = () => {
     setIngredientInputs(ingredientInputs + 1);
-  };
 
+  };
   const renderIngredientInput = () => {
     let inputs = [];
     for (let i = 0; i < ingredientInputs; i++) {
+      inputRefs.push(createRef());
       inputs.push(
-        <div key={i} style={{ padding: '3px' }}>
+        <div key={i} style={{ padding: '2px 3px 2px 15px' }}>
           <Input
-            label={<Dropdown defaultValue="un" options={options} />}
-            labelPosition="right"
+            type="text"
             placeholder="qt"
             style={{ width: '7ch' }}
+            ref={inputRefs[i]}
           />
-          <input style={{width: '55px'}}/>
-          <Input placeholder="ingredient" style={{paddingLeft: 10}}/>
+          <Select
+            compact
+            options={options}
+            defaultValue="un"
+            style={{ backgroundColor: '#e0e1e2' }}
+          />
+          <Input placeholder="ingredient" style={{ paddingLeft: 6 }} />
         </div>
       );
     }
@@ -49,12 +63,16 @@ const CreateRecipe = () => {
       <Formik>
         {(formikProps) => (
           <Form>
-            <Input label="title" />
+            <Input label="title" style={{ paddingBottom: '6px' }} />
+            {renderIngredientInput()}
           </Form>
         )}
       </Formik>
-      {renderIngredientInput()}
-      <Button onClick={addIngredientInput} className="ui button">
+      <Button
+        onClick={addIngredientInput}
+        className="ui button"
+        style={{ marginTop: '6px' }}
+      >
         Add Ingredient
       </Button>
     </>
