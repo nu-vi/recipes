@@ -1,5 +1,5 @@
 import React, { createRef, useState, useEffect } from 'react';
-import { Button, Dropdown, Input, Select } from 'semantic-ui-react';
+import { Button, Input, Select } from 'semantic-ui-react';
 import { Formik, Form } from 'formik';
 
 const options = [
