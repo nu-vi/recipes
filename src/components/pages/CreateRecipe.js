@@ -1,6 +1,8 @@
 import React, { createRef, useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Button, Input, Select } from 'semantic-ui-react';
-import { Formik, Form } from 'formik';
+import { Formik, Form, Field } from 'formik';
+import recipes from '../../apis/recipes';
 
 const options = [
   { key: 'un', text: 'un', value: 'un' },
@@ -15,25 +17,25 @@ const options = [
   { key: 'gallon', text: 'gallon', value: 'gallon' },
 ];
 
+const numerals = (number) => {
+  if (number === 1) return 'st';
+  if (number === 2) return 'nd';
+  if (number === 3) return 'rd';
+  else return 'th';
+};
+
 const CreateRecipe = () => {
   const [ingredientInputs, setIngredientInputs] = useState(0);
   const [stepInputs, setStepInputs] = useState(0);
+  const auth = useSelector((state) => state.auth);
 
-  const inputRefs = [];
-
+/*
   useEffect(() => {
     if (inputRefs[inputRefs.length - 1]) {
       inputRefs[inputRefs.length - 1].current.focus();
-      console.log(inputRefs);
     }
-  }, [inputRefs]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const numerals = (number) => {
-    if (number === 1) return 'st';
-    if (number === 2) return 'nd';
-    if (number === 3) return 'rd';
-    else return 'th';
-  };
+  }, [inputRefs]);
+*/
 
   const addIngredientInput = () => {
     setIngredientInputs(ingredientInputs + 1);
@@ -41,15 +43,17 @@ const CreateRecipe = () => {
 
   const renderIngredientInput = () => {
     let inputs = [];
+
     for (let i = 0; i < ingredientInputs; i++) {
-      inputRefs.push(createRef());
       inputs.push(
         <div key={i} style={{ padding: '2px 3px 2px 15px' }}>
-          <Input
+          <Field
+            name={`ingredient${i + 1}`}
+            as={Input}
+            autoFocus
             type="text"
             placeholder="qt"
             style={{ width: '7ch' }}
-            ref={inputRefs[inputRefs.length - 1]}
           />
           <Select
             compact
@@ -71,12 +75,11 @@ const CreateRecipe = () => {
   const renderStepInput = () => {
     let inputs = [];
     for (let i = 0; i < stepInputs; i++) {
-      inputRefs.push(createRef());
       inputs.push(
         <div key={i} style={{ padding: '2px 3px 2px 15px' }}>
           <Input
             placeholder={`${inputs.length + 1 + numerals(i + 1)} Step`}
-            ref={inputRefs[inputRefs.length - 1]}
+            autoFocus
           />
         </div>
       );
@@ -84,14 +87,32 @@ const CreateRecipe = () => {
     return <div>{inputs}</div> || null;
   };
 
+  const initialValues = () => {
+    return { title: '' };
+  };
+
+  const createRecipe = async (formValues) => {
+    const { userId } = auth;
+    const response = await recipes.post('/recipes', { ...formValues, userId });
+
+    console.log(response);
+    return response;
+  };
+
   return (
     <>
       <h1>New recipe</h1>
-      <Formik>
+      <Formik
+        initialValues={initialValues()}
+        onSubmit={(formValues, { setSubmitting }) => {
+          createRecipe(formValues).then((response) => {
+            setSubmitting(false);
+          });
+        }}
+      >
         {(formikProps) => (
           <Form>
-            <Input label="title" style={{ paddingBottom: '6px' }} />
-
+            <Field name="title" as={Input} style={{ paddingBottom: '6px' }} />
             {renderIngredientInput()}
             <Button
               type="button"
@@ -99,9 +120,9 @@ const CreateRecipe = () => {
               className="ui button"
               style={{ margin: '6px 0 6px 0' }}
             >
+              <i className="icon plus" />
               Add Ingredient
             </Button>
-
             {renderStepInput()}
             <Button
               type="button"
@@ -109,8 +130,13 @@ const CreateRecipe = () => {
               className="ui button"
               style={{ margin: '6px 0 6px 0' }}
             >
+              <i className="icon plus" />
               Add Step
             </Button>
+            <pre>
+              {JSON.stringify(formikProps.values, null, 2)}
+              {JSON.stringify(formikProps.errors, null, 2)}
+            </pre>
           </Form>
         )}
       </Formik>
