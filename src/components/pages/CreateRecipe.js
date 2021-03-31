@@ -1,10 +1,11 @@
 import React, { createRef, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Input, Select } from 'semantic-ui-react';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, useField } from 'formik';
 import recipes from '../../apis/recipes';
 
 const options = [
+  { key: ' ', text: ' ', value: ' ' },
   { key: 'un', text: 'un', value: 'un' },
   { key: 'g', text: 'g', value: 'g' },
   { key: 'Kg', text: 'Kg', value: 'Kg' },
@@ -28,40 +29,52 @@ const CreateRecipe = () => {
   const [ingredientInputs, setIngredientInputs] = useState(0);
   const [stepInputs, setStepInputs] = useState(0);
   const auth = useSelector((state) => state.auth);
-
-/*
-  useEffect(() => {
-    if (inputRefs[inputRefs.length - 1]) {
-      inputRefs[inputRefs.length - 1].current.focus();
-    }
-  }, [inputRefs]);
-*/
+  const initialValues = { title: '' };
+  const [addStepsButtonClicked, setAddStepsButtonClicked] = useState(false);
 
   const addIngredientInput = () => {
     setIngredientInputs(ingredientInputs + 1);
   };
 
-  const renderIngredientInput = () => {
+  const renderIngredientInput = ({
+    values,
+    setFieldValue,
+    setFieldTouched,
+  }) => {
     let inputs = [];
+    const handleChange = (e, { name, value }) => setFieldValue(name, value);
+    const handleBlur = (e, { name, value }) => setFieldTouched(name, value);
 
     for (let i = 0; i < ingredientInputs; i++) {
       inputs.push(
         <div key={i} style={{ padding: '2px 3px 2px 15px' }}>
           <Field
-            name={`ingredient${i + 1}`}
+            name={`quantity${i + 1}`}
+            value={values[`quantity${i + 1}`] || ''}
             as={Input}
             autoFocus
             type="text"
             placeholder="qt"
             style={{ width: '7ch' }}
           />
-          <Select
+          <Field
+            name={`unit${i + 1}`}
+            value={values[`unit${i + 1}`]}
+            as={Select}
+            onChange={handleChange}
+            onBlur={handleBlur}
             compact
             options={options}
-            defaultValue="un"
+            defaultValue=" "
             style={{ backgroundColor: '#e0e1e2' }}
           />
-          <Input placeholder="ingredient" style={{ paddingLeft: 6 }} />
+          <Field
+            as={Input}
+            name={`ingredient${i + 1}`}
+            value={values[`ingredient${i + 1}`] || ''}
+            placeholder="ingredient"
+            style={{ paddingLeft: 6 }}
+          />
         </div>
       );
     }
@@ -70,6 +83,7 @@ const CreateRecipe = () => {
 
   const addStepsInput = () => {
     setStepInputs(stepInputs + 1);
+    setAddStepsButtonClicked(true);
   };
 
   const renderStepInput = () => {
@@ -87,10 +101,6 @@ const CreateRecipe = () => {
     return <div>{inputs}</div> || null;
   };
 
-  const initialValues = () => {
-    return { title: '' };
-  };
-
   const createRecipe = async (formValues) => {
     const { userId } = auth;
     const response = await recipes.post('/recipes', { ...formValues, userId });
@@ -103,7 +113,7 @@ const CreateRecipe = () => {
     <>
       <h1>New recipe</h1>
       <Formik
-        initialValues={initialValues()}
+        initialValues={initialValues}
         onSubmit={(formValues, { setSubmitting }) => {
           createRecipe(formValues).then((response) => {
             setSubmitting(false);
@@ -113,7 +123,7 @@ const CreateRecipe = () => {
         {(formikProps) => (
           <Form>
             <Field name="title" as={Input} style={{ paddingBottom: '6px' }} />
-            {renderIngredientInput()}
+            {renderIngredientInput(formikProps)}
             <Button
               type="button"
               onClick={addIngredientInput}
@@ -128,11 +138,20 @@ const CreateRecipe = () => {
               type="button"
               onClick={addStepsInput}
               className="ui button"
-              style={{ margin: '6px 0 6px 0' }}
+              style={
+                addStepsButtonClicked
+                  ? { margin: '6px 0px 6px 0px' }
+                  : { margin: '0px 0 6px 0' }
+              }
             >
               <i className="icon plus" />
               Add Step
             </Button>
+            <div>
+              <Button type="submit" disabled={formikProps.isSubmitting}>
+                Submit
+              </Button>
+            </div>
             <pre>
               {JSON.stringify(formikProps.values, null, 2)}
               {JSON.stringify(formikProps.errors, null, 2)}
