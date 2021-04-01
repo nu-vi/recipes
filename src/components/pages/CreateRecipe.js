@@ -1,8 +1,10 @@
 import React, { createRef, useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Button, Input, Select } from 'semantic-ui-react';
-import { Formik, Form, Field, useField } from 'formik';
+import { Formik, Form, Field, useField, FormikProvider } from 'formik';
 import recipes from '../../apis/recipes';
+import { TextField } from '@material-ui/core';
+import { GreenTextField, GreenMultiLineTextField } from '../InputFields';
 
 const options = [
   { key: ' ', text: ' ', value: ' ' },
@@ -28,12 +30,25 @@ const numerals = (number) => {
 const CreateRecipe = () => {
   const [ingredientInputs, setIngredientInputs] = useState(0);
   const [stepInputs, setStepInputs] = useState(0);
-  const auth = useSelector((state) => state.auth);
-  const initialValues = { title: '' };
   const [addStepsButtonClicked, setAddStepsButtonClicked] = useState(false);
+  const auth = useSelector((state) => state.auth);
+  const initialValues = { title: '', description: '' };
 
-  const addIngredientInput = () => {
+  const handleAddIngredientInput = () => {
     setIngredientInputs(ingredientInputs + 1);
+  };
+
+  const handleAddStepsInput = () => {
+    setStepInputs(stepInputs + 1);
+    setAddStepsButtonClicked(true);
+  };
+
+  const handleSubmit = async (formValues) => {
+    const { userId } = auth;
+    const response = await recipes.post('/recipes', { ...formValues, userId });
+
+    console.log(response);
+    return response;
   };
 
   const renderIngredientInput = ({
@@ -47,20 +62,20 @@ const CreateRecipe = () => {
 
     for (let i = 0; i < ingredientInputs; i++) {
       inputs.push(
-        <div key={i} style={{ padding: '2px 3px 2px 15px' }}>
+        <div key={`ingredientInput${i}`} style={{ padding: '2px 3px 2px 0' }}>
           <Field
+            as={Input}
             name={`quantity${i + 1}`}
             value={values[`quantity${i + 1}`] || ''}
-            as={Input}
             autoFocus
             type="text"
             placeholder="qt"
             style={{ width: '7ch' }}
           />
           <Field
+            as={Select}
             name={`unit${i + 1}`}
             value={values[`unit${i + 1}`]}
-            as={Select}
             onChange={handleChange}
             onBlur={handleBlur}
             compact
@@ -81,17 +96,16 @@ const CreateRecipe = () => {
     return <div>{inputs}</div> || null;
   };
 
-  const addStepsInput = () => {
-    setStepInputs(stepInputs + 1);
-    setAddStepsButtonClicked(true);
-  };
-
-  const renderStepInput = () => {
+  const renderStepInput = ({ values }) => {
     let inputs = [];
+
     for (let i = 0; i < stepInputs; i++) {
       inputs.push(
-        <div key={i} style={{ padding: '2px 3px 2px 15px' }}>
-          <Input
+        <div key={`stepInput${i}`} style={{ padding: '2px 3px 2px 0' }}>
+          <Field
+            as={Input}
+            name={`step${i + 1}`}
+            value={values[`step${i + 1}`] || ''}
             placeholder={`${inputs.length + 1 + numerals(i + 1)} Step`}
             autoFocus
           />
@@ -101,42 +115,51 @@ const CreateRecipe = () => {
     return <div>{inputs}</div> || null;
   };
 
-  const createRecipe = async (formValues) => {
-    const { userId } = auth;
-    const response = await recipes.post('/recipes', { ...formValues, userId });
-
-    console.log(response);
-    return response;
-  };
-
   return (
     <>
       <h1>New recipe</h1>
       <Formik
         initialValues={initialValues}
         onSubmit={(formValues, { setSubmitting }) => {
-          createRecipe(formValues).then((response) => {
+          handleSubmit(formValues).then((response) => {
             setSubmitting(false);
           });
         }}
       >
         {(formikProps) => (
           <Form>
-            <Field name="title" as={Input} style={{ paddingBottom: '6px' }} />
+            <div>
+              <Field
+                name="title"
+                as={GreenTextField}
+                style={{ paddingBottom: '6px', minWidth: '280px' }}
+                label={<strong>Title</strong>}
+                id="standard-size-huge"
+              />
+            </div>
+            <div>
+              <Field
+                name="description"
+                as={GreenTextField}
+                style={{ paddingBottom: '6px', minWidth: '280px' }}
+                label={<strong>Description</strong>}
+                multiline
+              />
+            </div>
             {renderIngredientInput(formikProps)}
             <Button
               type="button"
-              onClick={addIngredientInput}
+              onClick={handleAddIngredientInput}
               className="ui button"
               style={{ margin: '6px 0 6px 0' }}
             >
               <i className="icon plus" />
               Add Ingredient
             </Button>
-            {renderStepInput()}
+            {renderStepInput(formikProps)}
             <Button
               type="button"
-              onClick={addStepsInput}
+              onClick={handleAddStepsInput}
               className="ui button"
               style={
                 addStepsButtonClicked
