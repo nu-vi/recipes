@@ -6,7 +6,7 @@ import img from './../../images/default-image.jpeg';
 
 class ListRecipes extends React.Component {
   componentDidMount() {
-    this.props.fetchRecipes().then((response) => console.log(response));
+    this.props.fetchRecipes();
   }
 
   renderList() {
@@ -21,7 +21,7 @@ class ListRecipes extends React.Component {
               {recipe.title}
             </Link>
             <div className="meta">
-              <div>{recipe.description}</div>
+              <div style={{marginTop: '4px'}}>{recipe.description}</div>
             </div>
           </div>
         </div>

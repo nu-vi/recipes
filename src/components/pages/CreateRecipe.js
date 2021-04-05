@@ -1,10 +1,10 @@
-import React, { createRef, useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import { Button, Input, Select } from 'semantic-ui-react';
-import { Formik, Form, Field, useField, FormikProvider } from 'formik';
-import recipes from '../../apis/recipes';
-import { TextField } from '@material-ui/core';
-import { GreenTextField, GreenMultiLineTextField } from '../InputFields';
+import { Formik, Form, Field } from 'formik';
+import { GreenTextField } from '../InputFields';
+import { createRecipe } from '../../actions';
 
 const options = [
   { key: ' ', text: ' ', value: ' ' },
@@ -32,6 +32,8 @@ const CreateRecipe = () => {
   const [stepInputs, setStepInputs] = useState(0);
   const [addStepsButtonClicked, setAddStepsButtonClicked] = useState(false);
   const auth = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const history = useHistory();
   const initialValues = { title: '', description: '' };
 
   const handleAddIngredientInput = () => {
@@ -44,10 +46,8 @@ const CreateRecipe = () => {
   };
 
   const handleSubmit = async (formValues) => {
-    const { userId } = auth;
-    const response = await recipes.post('/recipes', { ...formValues, userId });
+    const response = await dispatch(createRecipe(formValues));
 
-    console.log(response);
     return response;
   };
 
@@ -123,6 +123,9 @@ const CreateRecipe = () => {
         onSubmit={(formValues, { setSubmitting }) => {
           handleSubmit(formValues).then((response) => {
             setSubmitting(false);
+            if (response.status === 201) {
+              history.push('/');
+            }
           });
         }}
       >
